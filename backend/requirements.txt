@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+yt-dlp
+google-api-python-client
+openai
+python-dotenv
+pydantic
+websockets
+youtube-transcript-api
+google-auth-oauthlib

@@ -1,0 +1,23 @@
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - HOST=0.0.0.0
+      # Adicione outras variáveis como OPENAI_API_KEY se necessário
+    volumes:
+      - ./backend/datasets:/app/datasets
+      - ./backend/token.pickle:/app/token.pickle
+      - ./backend/client_secrets.json:/app/client_secrets.json
+
+  frontend:
+    build: 
+      context: ./antigravity-ui
+      args:
+        - VITE_API_URL=localhost:8080 # Para deploy real, mudar para o domínio da API
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend

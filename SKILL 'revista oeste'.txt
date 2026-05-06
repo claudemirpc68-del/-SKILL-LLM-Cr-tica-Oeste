@@ -1,0 +1,87 @@
+{
+  "skill_name": "LLM Crítica Oeste",
+  "description": "Gera comentários concisos e críticos sobre vídeos da Revista Oeste, com aprovação manual antes da publicação.",
+  "modules": [
+    {
+      "name": "youtube-data-fetcher",
+      "type": "collector",
+      "config": {
+        "source": "YouTube API",
+        "channel_id": "RevistaOeste",
+        "fields": ["title", "description", "transcript", "publish_date"]
+      }
+    },
+    {
+      "name": "text-summarizer",
+      "type": "processor",
+      "config": {
+        "method": "abstractive",
+        "length": "short",
+        "output_sentences": 3
+      }
+    },
+    {
+      "name": "llm-comment-generator",
+      "type": "generator",
+      "config": {
+        "model": "LLaMA-3",
+        "style": "critical_concise",
+        "max_sentences": 3,
+        "tone": "analytical"
+      }
+    },
+    {
+      "name": "antigravity-ui",
+      "type": "interface",
+      "config": {
+        "panels": [
+          "Novos Comentários",
+          "Histórico",
+          "Estatísticas"
+        ],
+        "actions": ["approve", "reject"]
+      }
+    },
+    {
+      "name": "rlhf-feedback-engine",
+      "type": "trainer",
+      "config": {
+        "method": "LoRA",
+        "feedback_source": "user_approval",
+        "update_frequency": "daily",
+        "dataset": [
+          {
+            "input": "Resumo: Debate sobre CLT e impacto nas empresas.",
+            "output": "O debate ignorou os efeitos sobre pequenas empresas; faltou profundidade na análise."
+          },
+          {
+            "input": "Resumo: Entrevista sobre eleições de 2026.",
+            "output": "A conversa foi interessante, mas evitou discutir propostas concretas dos candidatos."
+          },
+          {
+            "input": "Resumo: Discussão sobre política fiscal.",
+            "output": "A análise foi genérica; faltou abordar o impacto real sobre o orçamento público."
+          },
+          {
+            "input": "Resumo: Debate sobre Copa do Mundo e economia no futebol.",
+            "output": "O debate foi animado, mas não explorou os custos e benefícios financeiros dos megaeventos esportivos."
+          },
+          {
+            "input": "Resumo: Entrevista sobre o papel do Senado nas reformas.",
+            "output": "A entrevista destacou pontos políticos, mas deixou de lado a falta de eficiência legislativa."
+          }
+        ],
+        "feedback_log": "datasets/critica_oeste_log.json",
+        "auto_append": true
+      }
+    }
+  ],
+  "workflow": [
+    "youtube-data-fetcher -> text-summarizer -> llm-comment-generator -> antigravity-ui -> rlhf-feedback-engine"
+  ],
+  "triggers": {
+    "schedule": "daily",
+    "time": "07:00",
+    "action": "fetch_new_videos"
+  }
+}
