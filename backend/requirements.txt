@@ -8,3 +8,4 @@ pydantic
 websockets
 youtube-transcript-api
 google-auth-oauthlib
+feedparser
